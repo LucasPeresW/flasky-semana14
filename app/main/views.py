@@ -1,4 +1,4 @@
-from flask import render_template, session, redirect, url_for, flash
+from flask import render_template, session, redirect, url_for, flash, request
 
 from . import main
 from .forms import NameForm
@@ -7,7 +7,9 @@ from app.models import (
     inicializar_banco,
     carregar_usuarios,
     adicionar_usuario,
-    carregar_emails
+    carregar_emails,
+    editar_usuario,
+    excluir_usuario
 )
 
 from app.email import send_email
@@ -66,3 +68,28 @@ def emails_enviados():
         'emailsEnviados.html',
         emails=emails
     )
+
+@main.route('/editar/<nome>', methods=['POST'])
+def editar(nome):
+
+    novo_nome = request.form.get('novo_nome', '').strip()
+
+    if not novo_nome:
+        flash('O nome não pode ficar vazio.')
+    elif editar_usuario(nome, novo_nome):
+        flash('Usuário editado com sucesso.')
+    else:
+        flash('Não foi possível editar. Verifique o nome ou as permissões.')
+
+    return redirect(url_for('main.index'))
+
+
+@main.route('/excluir/<nome>', methods=['POST'])
+def excluir(nome):
+
+    if excluir_usuario(nome):
+        flash('Usuário excluído com sucesso.')
+    else:
+        flash('Não foi possível excluir esse usuário.')
+
+    return redirect(url_for('main.index'))

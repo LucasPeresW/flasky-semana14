@@ -1,49 +1,5 @@
 [
     {
-        "nome": "teste",
-        "funcao": "User"
-    },
-    {
-        "nome": "teste 2",
-        "funcao": "User"
-    },
-    {
-        "nome": "teste 3",
-        "funcao": "User"
-    },
-    {
-        "nome": "Lucas Peres",
-        "funcao": "User"
-    },
-    {
-        "nome": "Lucas Peres secreto",
-        "funcao": "User"
-    },
-    {
-        "nome": "Fabio Teixeira 20261005",
-        "funcao": "User"
-    },
-    {
-        "nome": "sim sou eu",
-        "funcao": "User"
-    },
-    {
-        "nome": "é mentira sou eu na verdadekkkkk",
-        "funcao": "User"
-    },
-    {
-        "nome": "sozinho",
-        "funcao": "User"
-    },
-    {
-        "nome": "teste sozinho",
-        "funcao": "User"
-    },
-    {
-        "nome": "teste amigos",
-        "funcao": "User"
-    },
-    {
         "nome": "teste professor",
         "funcao": "User"
     },
@@ -52,7 +8,23 @@
         "funcao": "User"
     },
     {
-        "nome": "???",
+        "nome": "Fabio Teixeira 20261026",
+        "funcao": "User"
+    },
+    {
+        "nome": "ola",
+        "funcao": "User"
+    },
+    {
+        "nome": "editando",
+        "funcao": "User"
+    },
+    {
+        "nome": "editando agora vai",
+        "funcao": "User"
+    },
+    {
+        "nome": "morra exclua desista",
         "funcao": "User"
     }
 ]

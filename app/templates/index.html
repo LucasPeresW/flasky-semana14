@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 
@@ -31,17 +32,94 @@
         <tr>
             <th>Nome do usuário</th>
             <th>Função</th>
+            <th>Ações</th>
         </tr>
     </thead>
 
     <tbody>
         {% for usuario in usuarios %}
         <tr>
-            <td>{{ usuario.nome }}</td>
+            <td>
+                <span id="nome-{{ loop.index }}">
+                    {{ usuario.nome }}
+                </span>
+
+                {% if usuario.funcao != 'Administrator' %}
+                <form
+                    id="form-editar-{{ loop.index }}"
+                    action="{{ url_for('main.editar', nome=usuario.nome) }}"
+                    method="POST"
+                    style="display: none;"
+                >
+                    <input
+                        type="text"
+                        name="novo_nome"
+                        value="{{ usuario.nome }}"
+                        class="form-control"
+                        required
+                    >
+
+                    <button type="submit" class="btn btn-primary btn-xs">
+                        Salvar
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn btn-default btn-xs"
+                        onclick="cancelarEdicao({{ loop.index }})"
+                    >
+                        Cancelar
+                    </button>
+                </form>
+                {% endif %}
+            </td>
+
             <td>{{ usuario.funcao }}</td>
+
+            <td>
+                {% if usuario.funcao != 'Administrator' %}
+
+                <button
+                    type="button"
+                    id="botao-editar-{{ loop.index }}"
+                    class="btn btn-default btn-xs"
+                    onclick="editarLinha({{ loop.index }})"
+                >
+                    Editar
+                </button>
+
+                <form
+                    action="{{ url_for('main.excluir', nome=usuario.nome) }}"
+                    method="POST"
+                    style="display: inline;"
+                    onsubmit="return confirm('Deseja realmente excluir este usuário?');"
+                >
+                    <button type="submit" class="btn btn-danger btn-xs">
+                        Excluir
+                    </button>
+                </form>
+
+                {% else %}
+                <span class="text-muted">Protegido</span>
+                {% endif %}
+            </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
+
+<script>
+function editarLinha(id) {
+    document.getElementById('nome-' + id).style.display = 'none';
+    document.getElementById('form-editar-' + id).style.display = 'block';
+    document.getElementById('botao-editar-' + id).style.display = 'none';
+}
+
+function cancelarEdicao(id) {
+    document.getElementById('nome-' + id).style.display = 'inline';
+    document.getElementById('form-editar-' + id).style.display = 'none';
+    document.getElementById('botao-editar-' + id).style.display = 'inline-block';
+}
+</script>
 
 {% endblock %}

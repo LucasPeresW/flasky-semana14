@@ -109,3 +109,43 @@ def adicionar_usuario(nome):
     salvar_usuarios(usuarios)
 
     return True
+
+def editar_usuario(nome_atual, novo_nome):
+    usuarios = carregar_usuarios()
+
+    # Não permite editar o administrador
+    for usuario in usuarios:
+        if usuario['nome'].lower() == nome_atual.lower():
+            if usuario['funcao'] == 'Administrator':
+                return False
+
+    # Verifica se o novo nome já existe
+    for usuario in usuarios:
+        if usuario['nome'].lower() == novo_nome.lower():
+            return False
+
+    # Altera o nome do usuário
+    for usuario in usuarios:
+        if usuario['nome'].lower() == nome_atual.lower():
+            usuario['nome'] = novo_nome
+            salvar_usuarios(usuarios)
+            return True
+
+    return False
+
+
+def excluir_usuario(nome):
+    usuarios = carregar_usuarios()
+
+    for usuario in usuarios:
+        if usuario['nome'].lower() == nome.lower():
+
+            # Não permite excluir o administrador
+            if usuario['funcao'] == 'Administrator':
+                return False
+
+            usuarios.remove(usuario)
+            salvar_usuarios(usuarios)
+            return True
+
+    return False
