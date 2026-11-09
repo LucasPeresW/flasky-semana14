@@ -35,3 +35,9 @@ class Config:
         'STUDENT_ID',
         'PT3037207'
     )
+
+    SQLALCHEMY_DATABASE_URI = (
+        'sqlite:///' + os.path.join(basedir, 'data.sqlite')
+    )
+
+    SQLALCHEMY_TRACK_MODIFICATIONS = False

@@ -3,6 +3,13 @@ import json
 import sqlite3
 from datetime import datetime
 
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
+
+from . import db
+from flask import current_app
+from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
+
 
 BASEDIR = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..')
@@ -149,3 +156,98 @@ def excluir_usuario(nome):
             return True
 
     return False
+
+class Role(db.Model):
+    __tablename__ = 'roles'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True)
+
+    users = db.relationship('User', backref='role', lazy='dynamic')
+
+
+class User(UserMixin, db.Model):
+    __tablename__ = 'users'
+
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, index=True, nullable=False)
+    username = db.Column(db.String(64), unique=True, index=True, nullable=False)
+    password_hash = db.Column(db.String(256), nullable=False)
+    confirmed = db.Column(db.Boolean, default=False, nullable=False)
+
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+
+    @property
+    def password(self):
+        raise AttributeError('A senha não pode ser lida diretamente.')
+
+    @password.setter
+    def password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def verify_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+    def generate_confirmation_token(self, expiration=3600):
+        serializer = URLSafeTimedSerializer(
+            current_app.config['SECRET_KEY']
+        )
+
+        return serializer.dumps(
+            {'confirm': self.id},
+            salt='account-confirm'
+        )
+
+    def confirm(self, token, expiration=3600):
+        serializer = URLSafeTimedSerializer(
+            current_app.config['SECRET_KEY']
+        )
+
+        try:
+            data = serializer.loads(
+                token,
+                salt='account-confirm',
+                max_age=expiration
+            )
+        except (BadSignature, SignatureExpired):
+            return False
+
+        if data.get('confirm') != self.id:
+            return False
+
+        self.confirmed = True
+        db.session.add(self)
+
+        return True
+
+    def generate_reset_token(self, expiration=3600):
+        serializer = URLSafeTimedSerializer(
+            current_app.config['SECRET_KEY']
+        )
+
+        return serializer.dumps(
+            {'reset': self.id},
+            salt='password-reset'
+        )
+
+    def reset_password(self, token, new_password, expiration=3600):
+        serializer = URLSafeTimedSerializer(
+            current_app.config['SECRET_KEY']
+        )
+
+        try:
+            data = serializer.loads(
+                token,
+                salt='password-reset',
+                max_age=expiration
+            )
+        except (BadSignature, SignatureExpired):
+            return False
+
+        if data.get('reset') != self.id:
+            return False
+
+        self.password = new_password
+        db.session.add(self)
+
+        return True

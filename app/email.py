@@ -119,3 +119,54 @@ def send_email(
     thread.start()
 
     return thread
+
+def send_password_reset_email(recipient, reset_url):
+    app = current_app._get_current_object()
+
+    subject = (
+        app.config['FLASKY_MAIL_SUBJECT_PREFIX']
+        + ' Recuperação de senha'
+    )
+
+    html_content = f"""
+    <h3>Recuperação de senha</h3>
+
+    <p>Recebemos uma solicitação para redefinir sua senha.</p>
+
+    <p>Para cadastrar uma nova senha, acesse:</p>
+
+    <p>
+        <a href="{reset_url}">
+            Redefinir minha senha
+        </a>
+    </p>
+
+    <p>Se o botão não funcionar, copie este endereço:</p>
+
+    <p>{reset_url}</p>
+
+    <p>Este link expira em uma hora.</p>
+
+    <p>Se você não solicitou essa alteração, ignore este e-mail.</p>
+    """
+
+    salvar_email(
+        de='Flasky',
+        destinatarios=[recipient],
+        assunto=subject,
+        texto=f'Link para redefinir a senha: {reset_url}'
+    )
+
+    thread = Thread(
+        target=send_async_email,
+        args=[
+            app,
+            [recipient],
+            subject,
+            html_content
+        ]
+    )
+
+    thread.start()
+
+    return thread
